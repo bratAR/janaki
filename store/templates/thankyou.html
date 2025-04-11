@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thank You - Janaki Verity</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fff0f5;
+            text-align: center;
+            padding: 3rem;
+            color: #cc3366;
+        }
+        .thank-you-box {
+            background: #ffe6f0;
+            border-radius: 16px;
+            padding: 2rem;
+            display: inline-block;
+            box-shadow: 0 0 12px #fbbbd4;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        p {
+            font-size: 1.1rem;
+        }
+        a {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.6rem 1.5rem;
+            background: #ff69b4;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        a:hover {
+            background: #ff1493;
+        }
+    </style>
+</head>
+<body>
+    <div class="thank-you-box">
+        <h1>Thank You for Your Order! 💖</h1>
+        <p>Your beautiful products are on their way ✨</p>
+        <a href="{% url 'home' %}">Continue Shopping</a>
+    </div>
+</body>
+</html>

@@ -55,10 +55,11 @@ ROOT_URLCONF = 'janaki.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [BASE_DIR / 'templates'],  # This line allows Django to find templates at the project level
+        'APP_DIRS': True,  # This ensures Django can look inside your app's 'templates' folder
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -127,3 +128,6 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+import os
+print("Template dirs:", os.path.join(BASE_DIR, 'templates'))

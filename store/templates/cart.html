@@ -1,0 +1,19 @@
+<h2>Your Shopping Cart 🛒</h2>
+
+{% if cart_items %}
+    {% for item in cart_items %}
+        <form action="{% url 'update_cart' item.product.id %}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            {% csrf_token %}
+            <span style="width: 120px;">{{ item.product.name }}</span>
+            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px; text-align: center;">
+            <button type="submit" style="background: #66cc99; color: white; border: none; padding: 0.2rem 0.6rem; border-radius: 6px;">Update</button>
+            <a href="{% url 'remove_from_cart' item.product.id %}" style="color: white; background: #ff4d4d; padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;">Remove</a>
+        </form>
+    {% endfor %}
+
+    <p><strong>Total: Rs. {{ total }}</strong></p>
+    <a href="{% url 'checkout' %}" style="background: #cc66cc; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;">Proceed to Checkout</a>
+{% else %}
+    <p>{{ message|default:"Your cart is empty 😢" }}</p>
+    <a href="{% url 'home' %}" style="text-decoration: underline; color: #ff6699;">Continue Shopping</a>
+{% endif %}
