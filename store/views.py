@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Product, Category
 from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
 def home(request):
     categories = Category.objects.all()
@@ -46,13 +47,21 @@ def thank_you_view(request):
 def add_to_cart(request, product_id):
     cart = request.session.get('cart', {})
     cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+    cart[product_id] = cart.get(product_id, 0) + 1  # Increment quantity
     request.session['cart'] = cart
     return redirect('cart')
 
 def cart_view(request):
     cart = request.session.get('cart', {})
-    if not cart:
-        return render(request, 'cart.html', {'message': 'Your cart is empty!'})
+    cart_items = []
+    total = 0
+    for product_id, quantity in cart.items():
+        product = get_object_or_404(Product, id=product_id)
+        subtotal = product.price * quantity
+        cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
+        total += subtotal
+    return render(request, 'cart.html', {'cart_items': cart_items, 'total': total})
+
     
     products = []
     total = 0
@@ -63,6 +72,36 @@ def cart_view(request):
         total += subtotal
     return render(request, 'cart.html', {'cart_items': products, 'total': total})
 
+def ajax_add_to_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        cart = request.session.get('cart', {})
+        cart[product_id] = cart.get(product_id, 0) + 1
+        request.session['cart'] = cart
+        return JsonResponse({'success': True, 'cartCount': sum(cart.values())})
+    return JsonResponse({'success': False})
+
+def ajax_update_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        quantity = int(request.POST.get('quantity', 1))
+        cart = request.session.get('cart', {})
+        if quantity > 0:
+            cart[product_id] = quantity
+        else:
+            cart.pop(product_id, None)
+        request.session['cart'] = cart
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+def ajax_remove_from_cart(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        cart = request.session.get('cart', {})
+        cart.pop(product_id, None)
+        request.session['cart'] = cart
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
 
 # store/views.py
 def remove_from_cart(request, product_id):

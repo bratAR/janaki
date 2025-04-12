@@ -1,19 +1,234 @@
-<h2>Your Shopping Cart 🛒</h2>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Cart - Janaki Verity</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fffafc;
+            margin: 0;
+            padding: 2rem;
+            color: #333;
+        }
 
-{% if cart_items %}
-    {% for item in cart_items %}
-        <form action="{% url 'update_cart' item.product.id %}" method="POST" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-            {% csrf_token %}
-            <span style="width: 120px;">{{ item.product.name }}</span>
-            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" style="width: 60px; text-align: center;">
-            <button type="submit" style="background: #66cc99; color: white; border: none; padding: 0.2rem 0.6rem; border-radius: 6px;">Update</button>
-            <a href="{% url 'remove_from_cart' item.product.id %}" style="color: white; background: #ff4d4d; padding: 0.2rem 0.6rem; border-radius: 6px; text-decoration: none;">Remove</a>
-        </form>
-    {% endfor %}
+        .cart-container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff0f5;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 0 12px #fbbbd4;
+        }
 
-    <p><strong>Total: Rs. {{ total }}</strong></p>
-    <a href="{% url 'checkout' %}" style="background: #cc66cc; color: white; padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;">Proceed to Checkout</a>
-{% else %}
-    <p>{{ message|default:"Your cart is empty 😢" }}</p>
-    <a href="{% url 'home' %}" style="text-decoration: underline; color: #ff6699;">Continue Shopping</a>
-{% endif %}
+        h2 {
+            text-align: center;
+            color: #cc3366;
+            margin-bottom: 2rem;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ffe0ec;
+            border-radius: 12px;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(255, 204, 221, 0.2);
+        }
+
+        .cart-item span {
+            flex: 1;
+            font-weight: bold;
+        }
+
+        .cart-item input {
+            width: 60px;
+            padding: 0.4rem;
+            text-align: center;
+            border-radius: 6px;
+            border: 1px solid #ffccd5;
+        }
+
+        .cart-item button,
+        .cart-item a {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+
+        .update-btn {
+            background-color: #66cc99;
+        }
+
+        .remove-btn {
+            background-color: #ff4d4d;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1rem;
+            color: #cc3366;
+        }
+
+        .checkout-btn {
+            display: block;
+            width: fit-content;
+            margin: 2rem auto 0;
+            background: #cc66cc;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #999;
+        }
+
+        .continue-shopping {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: #ff6699;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-container">
+        <h2>Your Shopping Cart 🛒</h2>
+
+        {% if cart_items %}
+            {% for item in cart_items %}
+                <form class="cart-item" action="{% url 'update_cart' item.product.id %}" method="POST">
+                    {% csrf_token %}
+                    <span>{{ item.product.name }}</span>
+                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                    <button type="submit" class="update-btn">Update</button>
+                    <a href="{% url 'remove_from_cart' item.product.id %}" class="remove-btn">Remove</a>
+                </form>
+            {% endfor %}
+
+            <p class="total">Total: Rs. {{ total }}</p>
+            <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout 💳</a>
+        {% else %}
+            <p class="empty-cart">{{ message|default:"Your cart is empty 😢" }}</p>
+            <a href="{% url 'home' %}" class="continue-shopping">Continue Shopping</a>
+        {% endif %}
+    </div>
+</body>
+<script>
+    // Add product to the cart using AJAX
+    function addToCart(productId) {
+        fetch('/ajax/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ product_id: productId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the cart dynamically without reloading
+                updateCartView(data.cart);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Update the quantity of a product in the cart using AJAX
+    function updateCart(productId, quantity) {
+        fetch(`/ajax/update-cart/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ product_id: productId, quantity: quantity }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the cart dynamically
+                updateCartView(data.cart);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Remove a product from the cart using AJAX
+    function removeFromCart(productId) {
+        fetch(`/ajax/remove-from-cart/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ product_id: productId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the cart dynamically
+                updateCartView(data.cart);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Update the cart view on the page
+    function updateCartView(cart) {
+        // Assuming you have an element with the ID "cart-items" to hold the cart items
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        let cartHTML = '';
+        let total = 0;
+
+        cart.items.forEach(item => {
+            cartHTML += `
+                <div class="cart-item">
+                    <span class="product-name">${item.name} × ${item.quantity}</span>
+                    <span class="product-price">Rs. ${item.subtotal}</span>
+                    <button onclick="removeFromCart(${item.product_id})">Remove</button>
+                    <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.product_id}, this.value)">
+                </div>
+            `;
+            total += item.subtotal;
+        });
+
+        cartItemsContainer.innerHTML = cartHTML;
+        cartTotal.textContent = `Total: Rs. ${total}`;
+    }
+
+    // Helper function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+</html>
