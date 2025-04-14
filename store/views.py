@@ -4,12 +4,17 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
 def home(request):
+    category_id = request.GET.get('category')
+    if category_id:
+        products = Product.objects.filter(category_id=category_id)
+    else:
+        products = Product.objects.all()
     categories = Category.objects.all()
-    products = Product.objects.all()
     return render(request, 'store/home.html', {
         'categories': categories,
-        'products': products
+        'products': products,
     })
+
 
 @require_POST
 def update_cart(request, product_id):

@@ -36,11 +36,28 @@
             border-radius: 12px;
             background-color: #fff;
             box-shadow: 0 2px 6px rgba(255, 204, 221, 0.2);
+            flex-wrap: wrap;
         }
 
-        .cart-item span {
-            flex: 1;
-            font-weight: bold;
+        .cart-info {
+            flex: 2;
+        }
+
+        .cart-info strong {
+            display: block;
+            font-size: 1.1rem;
+        }
+
+        .cart-info small {
+            display: block;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .cart-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .cart-item input {
@@ -111,110 +128,49 @@
         <h2>Your Shopping Cart 🛒</h2>
 
         {% if cart_items %}
-            {% for item in cart_items %}
-                <form class="cart-item" action="{% url 'update_cart' item.product.id %}" method="POST">
-                    {% csrf_token %}
-                    <span>{{ item.product.name }}</span>
-                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                    <button type="submit" class="update-btn">Update</button>
-                    <a href="{% url 'remove_from_cart' item.product.id %}" class="remove-btn">Remove</a>
-                </form>
-            {% endfor %}
+            <div id="cart-items">
+                {% for item in cart_items %}
+                    <form class="cart-item" action="{% url 'update_cart' item.product.id %}" method="POST">
+                        {% csrf_token %}
+                        <div class="cart-info">
+                            <strong>{{ item.product.name }}</strong>
+                            <small>Price: Rs. {{ item.product.price }}</small>
+                            <small>Subtotal: Rs. {{ item.subtotal }}</small>
+                        </div>
+                        <div class="cart-controls">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                            <button type="submit" class="update-btn">Update</button>
+                            <a href="{% url 'remove_from_cart' item.product.id %}" class="remove-btn">Remove</a>
+                        </div>
+                    </form>
+                {% endfor %}
+            </div>
 
-            <p class="total">Total: Rs. {{ total }}</p>
+            <p class="total" id="cart-total">Total: Rs. {{ total }}</p>
             <a href="{% url 'checkout' %}" class="checkout-btn">Proceed to Checkout 💳</a>
-        {% else %}
+            <a href="{% url 'home' %}" class="continue-shopping" style="
+    display: block;
+    width: fit-content;
+    margin: 1rem auto 0;
+    background: #ff99cc;
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+">🛍️ Keep Shopping</a>
+
+            {% else %}
             <p class="empty-cart">{{ message|default:"Your cart is empty 😢" }}</p>
             <a href="{% url 'home' %}" class="continue-shopping">Continue Shopping</a>
         {% endif %}
     </div>
 </body>
+
+<!-- AJAX Functionality -->
 <script>
-    // Add product to the cart using AJAX
-    function addToCart(productId) {
-        fetch('/ajax/add-to-cart/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: JSON.stringify({ product_id: productId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update the cart dynamically without reloading
-                updateCartView(data.cart);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    // Update the quantity of a product in the cart using AJAX
-    function updateCart(productId, quantity) {
-        fetch(`/ajax/update-cart/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: JSON.stringify({ product_id: productId, quantity: quantity }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update the cart dynamically
-                updateCartView(data.cart);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    // Remove a product from the cart using AJAX
-    function removeFromCart(productId) {
-        fetch(`/ajax/remove-from-cart/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken'),
-            },
-            body: JSON.stringify({ product_id: productId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Update the cart dynamically
-                updateCartView(data.cart);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
-    // Update the cart view on the page
-    function updateCartView(cart) {
-        // Assuming you have an element with the ID "cart-items" to hold the cart items
-        const cartItemsContainer = document.getElementById('cart-items');
-        const cartTotal = document.getElementById('cart-total');
-        let cartHTML = '';
-        let total = 0;
-
-        cart.items.forEach(item => {
-            cartHTML += `
-                <div class="cart-item">
-                    <span class="product-name">${item.name} × ${item.quantity}</span>
-                    <span class="product-price">Rs. ${item.subtotal}</span>
-                    <button onclick="removeFromCart(${item.product_id})">Remove</button>
-                    <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.product_id}, this.value)">
-                </div>
-            `;
-            total += item.subtotal;
-        });
-
-        cartItemsContainer.innerHTML = cartHTML;
-        cartTotal.textContent = `Total: Rs. ${total}`;
-    }
-
-    // Helper function to get CSRF token from cookies
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -228,6 +184,69 @@
             }
         }
         return cookieValue;
+    }
+
+    function updateCart(productId, quantity) {
+        fetch(`/ajax/update-cart/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ product_id: productId, quantity: quantity }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartView(data.cart);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function removeFromCart(productId) {
+        fetch(`/ajax/remove-from-cart/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({ product_id: productId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateCartView(data.cart);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function updateCartView(cart) {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotal = document.getElementById('cart-total');
+        let cartHTML = '';
+        let total = 0;
+
+        cart.items.forEach(item => {
+            total += item.subtotal;
+            cartHTML += `
+                <form class="cart-item">
+                    <div class="cart-info">
+                        <strong>${item.name}</strong>
+                        <small>Price: Rs. ${item.price}</small>
+                        <small>Subtotal: Rs. ${item.subtotal}</small>
+                    </div>
+                    <div class="cart-controls">
+                        <input type="number" value="${item.quantity}" min="1" onchange="updateCart(${item.product_id}, this.value)">
+                        <button type="button" class="update-btn" onclick="updateCart(${item.product_id}, this.previousElementSibling.value)">Update</button>
+                        <button type="button" class="remove-btn" onclick="removeFromCart(${item.product_id})">Remove</button>
+                    </div>
+                </form>`;
+        });
+
+        cartItemsContainer.innerHTML = cartHTML;
+        cartTotal.textContent = `Total: Rs. ${total}`;
     }
 </script>
 
