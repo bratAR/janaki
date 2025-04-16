@@ -35,8 +35,10 @@ ROOT_URLCONF = 'janaki.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # This line allows Django to find templates at the project level
-        'APP_DIRS': True,  # This ensures Django can look inside your app's 'templates' folder
+        'DIRS': [
+            BASE_DIR / 'templates',  # This should include your templates directory
+        ],
+        'APP_DIRS': True,  # Ensures templates in apps are found
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -47,6 +49,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'janaki.wsgi.application'
 

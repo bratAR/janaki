@@ -160,6 +160,20 @@
                 <strong>Price: Rs. {{ product.price }}</strong><br>
                 <p>{{ product.description|truncatechars:100 }}</p>
                 <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
+                <a href="{% url 'cart' %}" class="btn" style="
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #ff66a5;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    text-decoration: none;
+">
+    🛒 My Cart
+</a>
+
             </div>
         {% endfor %}
     </div>

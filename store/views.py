@@ -3,6 +3,7 @@ from .models import Product, Category
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 
+# Home page - with category filtering
 def home(request):
     category_id = request.GET.get('category')
     if category_id:
@@ -15,7 +16,45 @@ def home(request):
         'products': products,
     })
 
+# Cart view - show all items in cart with subtotal and total
+def cart_view(request):
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total = 0
 
+    for product_id, quantity in cart.items():
+        product = get_object_or_404(Product, id=product_id)
+        subtotal = product.price * quantity
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'subtotal': subtotal
+        })
+        total += subtotal
+
+    return render(request, 'store/cart.html', {
+        'cart_items': cart_items,
+        'total': total
+    })
+
+# Add to cart (regular, non-AJAX)
+def add_to_cart(request, product_id):
+    cart = request.session.get('cart', {})
+    product_id_str = str(product_id)
+    cart[product_id_str] = cart.get(product_id_str, 0) + 1
+    request.session['cart'] = cart
+    return redirect('cart')
+
+# Remove item from cart (non-AJAX)
+def remove_from_cart(request, product_id):
+    cart = request.session.get('cart', {})
+    product_id_str = str(product_id)
+    if product_id_str in cart:
+        del cart[product_id_str]
+        request.session['cart'] = cart
+    return redirect('cart')
+
+# Update cart item quantity (non-AJAX)
 @require_POST
 def update_cart(request, product_id):
     cart = request.session.get('cart', {})
@@ -33,50 +72,7 @@ def update_cart(request, product_id):
     request.session['cart'] = cart
     return redirect('cart')
 
-from django.shortcuts import render, redirect
-
-def checkout_view(request):
-    if request.method == 'POST':
-        # Clear the cart as part of the checkout process (mock action)
-        request.session['cart'] = {}
-        # Redirect to the 'thankyou' page after checkout
-        return redirect('thankyou')
-
-    return render(request, 'checkout.html')
-
-def thank_you_view(request):
-    # Simply render the thank-you page
-    return render(request, 'thankyou.html')
-
-
-def add_to_cart(request, product_id):
-    cart = request.session.get('cart', {})
-    cart[str(product_id)] = cart.get(str(product_id), 0) + 1
-    cart[product_id] = cart.get(product_id, 0) + 1  # Increment quantity
-    request.session['cart'] = cart
-    return redirect('cart')
-
-def cart_view(request):
-    cart = request.session.get('cart', {})
-    cart_items = []
-    total = 0
-    for product_id, quantity in cart.items():
-        product = get_object_or_404(Product, id=product_id)
-        subtotal = product.price * quantity
-        cart_items.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
-        total += subtotal
-    return render(request, 'cart.html', {'cart_items': cart_items, 'total': total})
-
-    
-    products = []
-    total = 0
-    for product_id, quantity in cart.items():
-        product = get_object_or_404(Product, id=product_id)
-        subtotal = product.price * quantity
-        products.append({'product': product, 'quantity': quantity, 'subtotal': subtotal})
-        total += subtotal
-    return render(request, 'cart.html', {'cart_items': products, 'total': total})
-
+# AJAX - Add to cart
 def ajax_add_to_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -86,6 +82,7 @@ def ajax_add_to_cart(request):
         return JsonResponse({'success': True, 'cartCount': sum(cart.values())})
     return JsonResponse({'success': False})
 
+# AJAX - Update item quantity in cart
 def ajax_update_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -99,6 +96,7 @@ def ajax_update_cart(request):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
+# AJAX - Remove item from cart
 def ajax_remove_from_cart(request):
     if request.method == 'POST':
         product_id = request.POST.get('product_id')
@@ -108,20 +106,13 @@ def ajax_remove_from_cart(request):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False})
 
-# store/views.py
-def remove_from_cart(request, product_id):
-    cart = request.session.get('cart', {})
-    product_id_str = str(product_id)
-
-    if product_id_str in cart:
-        del cart[product_id_str]
-        request.session['cart'] = cart
-
-    return redirect('cart')
-
-
+# Checkout view - mock checkout and redirect to thank you
 def checkout_view(request):
-    # Clear cart for now as a simple "checkout"
-    request.session['cart'] = {}
+    if request.method == 'POST':
+        request.session['cart'] = {}  # clear cart
+        return redirect('thankyou')
     return render(request, 'checkout.html')
-# Create your views here.
+
+# Thank you page
+def thank_you_view(request):
+    return render(request, 'thankyou.html')
