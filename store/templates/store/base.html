@@ -4,17 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Store{% endblock %}</title>
+    <style>
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background-color: #ffedf4;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        nav a {
+            text-decoration: none;
+            color: #cc3366;
+            font-weight: bold;
+            margin-left: 1rem;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <header>
         <nav>
-            <a href="/">Home</a>
-            <a href="/cart/">Cart</a>
+            <div>
+                <a href="/">🏠 Home</a>
+            </div>
+            <div>
+                <a href="/cart/">🛒 Cart (<span id="cart-count">{{ cart_count|default:0 }}</span>)</a>
+            </div>
         </nav>
     </header>
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    <!-- Optional: Load static JS file -->
+    {# <script src="{% static 'store/js/cart.js' %}"></script> #}
+
+    <!-- Or Inline JS for handling add-to-cart buttons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const productId = this.dataset.productId;
+
+                    fetch(`/add-to-cart/${productId}/`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const cartCountElement = document.getElementById('cart-count');
+                            if (cartCountElement) {
+                                cartCountElement.textContent = data.cartCount;
+                            }
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

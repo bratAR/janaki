@@ -178,4 +178,40 @@
         {% endfor %}
     </div>
 </body>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            for (const cookie of document.cookie.split(';')) {
+                const [key, value] = cookie.trim().split('=');
+                if (key === name) {
+                    cookieValue = decodeURIComponent(value);
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function addToCart(productId) {
+        fetch('/ajax/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('cart-count').textContent = data.cart_count;
+                // Optional: feedback to user
+                alert('✅ Added to cart!');
+            }
+        });
+    }
+    </script>
+    
 </html>
