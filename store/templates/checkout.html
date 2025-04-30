@@ -56,7 +56,7 @@
 <body>
     <div class="checkout-box">
         <h2>🌸 Checkout 🌸</h2>
-        <form method="post">
+        <form method="post" action="{% url 'checkout' %}">
             {% csrf_token %}
             <label>Full Name:</label>
             <input type="text" name="name" required>

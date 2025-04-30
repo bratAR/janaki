@@ -89,7 +89,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # settings.py
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
 EMAIL_PORT = 587  # Use 587 for TLS (secure)
 EMAIL_USE_TLS = True  # Enable TLS encryption

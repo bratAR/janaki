@@ -6,6 +6,7 @@ import json
 from django.core.mail import send_mail
 from django.conf import settings
 from django.http import HttpResponse
+from django.contrib import messages
 from django.shortcuts import render
 from .models import Order
 
@@ -145,23 +146,36 @@ def place_order(request):
         return redirect('thankyou')
 
 # Checkout view
+from django.core.mail import send_mail
+from django.conf import settings
+
 def checkout_view(request):
     if request.method == 'POST':
-        customer_email = request.POST.get('email')
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        payment_method = request.POST.get('payment_method')
+        email = request.POST.get('email')  # You need to add this field in your HTML form!
 
-        # Send confirmation email
+        # Send email
         send_mail(
-            'Order Confirmation - Janaki Verity',
-            'Thank you for your order! We have received it and are processing it.',
-            settings.EMAIL_HOST_USER,
-            [customer_email],
+            subject='Order Confirmation - Janaki Verity',
+            message=f'Thank you {name} for your order!\n\n'
+                    f'Address: {address}\n'
+                    f'Phone: {phone}\n'
+                    f'Payment Method: {payment_method}\n'
+                    f'We will contact you soon.',
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[email],
             fail_silently=False,
         )
 
-        request.session['cart'] = {}  # Clear cart
+        # Clear cart and redirect
+        request.session['cart'] = {}
         return redirect('thankyou')
 
     return render(request, 'checkout.html')
+
 
 # Thank you page
 def thank_you_view(request):
