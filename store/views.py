@@ -161,6 +161,9 @@ def checkout_view(request):
         send_mail(
             subject='Order Confirmation - Janaki Verity',
             message=f'Thank you {name} for your order!\n\n'
+                    f'Order Details:\n'
+                    f'Name: {name}\n'
+                    f'email: {email}\n'
                     f'Address: {address}\n'
                     f'Phone: {phone}\n'
                     f'Payment Method: {payment_method}\n'
