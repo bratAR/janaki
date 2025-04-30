@@ -31,7 +31,10 @@
                 <a href="/">🏠 Home</a>
             </div>
             <div>
-                <a href="/cart/">🛒 Cart (<span id="cart-count">{{ cart_count|default:0 }}</span>)</a>
+                <a href="{% url 'cart' %}" class="cart-icon">
+                    🛒 <span id="cart-count">{{ cart_item_count }}</span>
+                </a>
+                
             </div>
         </nav>
     </header>

@@ -45,7 +45,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'store.context_processors.cart_count',
+                'store.context_processors.cart_item_count',
             ],
         },
     },
@@ -85,3 +85,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files (Uploaded images, etc.)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# settings.py
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Gmail's SMTP server
+EMAIL_PORT = 587  # Use 587 for TLS (secure)
+EMAIL_USE_TLS = True  # Enable TLS encryption
+EMAIL_HOST_USER = 'janakiverity5151@gmail.com'  # Replace with your Gmail address
+EMAIL_HOST_PASSWORD = 'xutk zvtg mhxr tcgf'  # Replace with your Gmail password (or app password)
