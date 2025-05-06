@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Janaki Verity</title>
     <style>
         body {
@@ -9,14 +12,116 @@
             margin: 0;
             padding: 0;
         }
+
+        /* First Navbar */
+        .navbar {
+            background-color: #ffeff7;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ffd6e8;
+            position: relative;
+            z-index: 10;
+        }
+
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #cc3366;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #cc3366;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Second Navbar (Search & Cart) */
+        .cart-search-navbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            background-color: #ffeff7;
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        /* Search Icon */
+        .search-container {
+            position: relative;
+            margin-right: 20px;
+        }
+
+        .search-icon {
+            font-size: 1.5rem;
+            color: #cc3366;
+            cursor: pointer;
+        }
+
+        /* Hidden Search Input */
+        .search-input {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            padding: 0.5rem;
+            border: 1px solid #ffb6c1;
+            border-radius: 6px;
+            outline: none;
+            font-size: 0.9rem;
+            transition: width 0.3s ease;
+            opacity: 0;
+        }
+
+        .search-input:focus {
+            opacity: 1;
+        }
+
+        .search-container.active .search-input {
+            width: 180px;
+            opacity: 1;
+        }
+
+        /* Cart Button */
+        .cart-link {
+            background-color: #ff66a5;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .cart-link:hover {
+            background-color: #ff1493;
+        }
+
+        /* Header */
         .header {
-            background-color: #ffccdd;
-            padding: 1rem;
             text-align: center;
             font-size: 2rem;
             font-weight: bold;
-            color: #333;
+            color: #cc3366;
+            margin: 1rem 0;
         }
+
+        /* Product and Category Styles */
         .container {
             padding: 2rem;
             display: flex;
@@ -24,7 +129,8 @@
             gap: 2rem;
             justify-content: center;
         }
-        .product, .category {
+
+        .product {
             border: 1px solid #ffe6ee;
             border-radius: 16px;
             background-color: #fff0f5;
@@ -32,7 +138,21 @@
             width: 250px;
             box-shadow: 0 0 10px #fcd6e1;
             text-align: center;
+            position: relative;
         }
+
+        .product img {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            color: #cc3366;
+        }
+
         .btn-cart {
             display: inline-block;
             margin-top: 0.5rem;
@@ -44,59 +164,12 @@
             text-decoration: none;
             font-weight: bold;
         }
+
         .btn-cart:hover {
             background-color: #ff1493;
         }
-        .category img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        img {
-            max-width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 12px;
-        }
-        h2 {
-            font-size: 1.2rem;
-            color: #cc3366;
-        }
-        p {
-            font-size: 0.9rem;
-            color: #555;
-        }
 
-        .category-row {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 1rem 2rem;
-    gap: 1rem;
-    scrollbar-width: thin;
-    scrollbar-color: #ffccdd transparent;
-}
-
-.category-row::-webkit-scrollbar {
-    height: 8px;
-}
-.category-row::-webkit-scrollbar-thumb {
-    background-color: #ffccdd;
-    border-radius: 10px;
-}
-.category-row::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.category {
-    flex: 0 0 auto;
-    width: 200px;
-}
-
-
-    </style>
-    <style>
+        /* Categories */
         .category-row {
             display: flex;
             overflow-x: auto;
@@ -105,7 +178,7 @@
             margin-bottom: 2rem;
             scroll-behavior: smooth;
         }
-    
+
         .category-btn {
             flex: 0 0 auto;
             text-align: center;
@@ -115,14 +188,14 @@
             text-decoration: none;
             color: #cc3366;
             transition: 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
-    
+
         .category-btn:hover {
             background: #ffccdd;
             transform: scale(1.05);
         }
-    
+
         .category-btn img {
             width: 100px;
             height: 80px;
@@ -130,26 +203,75 @@
             border-radius: 8px;
             margin-bottom: 0.5rem;
         }
+
+        /* Footer */
+        .footer {
+            background-color: #ffeff7;
+            padding: 2rem;
+            text-align: center;
+            border-top: 2px solid #ffd6e8;
+            margin-top: 4rem;
+        }
+
+        .footer a {
+            color: #cc3366;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        iframe {
+            border: none;
+            margin-top: 1rem;
+            border-radius: 8px;
+        }
     </style>
-    
 </head>
+
 <body>
-    <div class="header">Janaki Verity💅</div>
+
+    <!-- First Navbar -->
+    <div class="navbar">
+        <div class="navbar-brand">Janaki Verity 💅</div>
+
+        <div class="nav-links">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about' %}">About</a>
+            <a href="{% url 'contact' %}">Contact</a>
+            <a href="https://www.instagram.com/YOUR_USERNAME" target="_blank">Instagram</a>
+            <a href="https://www.tiktok.com/@YOUR_USERNAME" target="_blank">TikTok</a>
+        </div>
+    </div>
+
+    <!-- Second Navbar (Search & Cart) -->
+    <div class="cart-search-navbar">
+        <!-- Search Icon -->
+        <div class="search-container" onclick="toggleSearch()">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search..." class="search-input">
+        </div>
+
+        <!-- Cart Link -->
+        <a href="{% url 'cart' %}" class="cart-link">🛒 My Cart ({{ cart_item_count }})</a>
+    </div>
+
+    <div class="header">Welcome to Janaki Verity</div>
 
     <h2 style="text-align:center;">🌸 Categories 🌸</h2>
     <div class="category-row">
-    {% for category in categories %}
-        <a href="?category={{ category.id }}" class="category-btn">
-            {% if category.image %}
-                <img src="{{ category.image.url }}" alt="{{ category.name }}">
-            {% endif %}
-            <span>{{ category.name }}</span>
-        </a>
-    {% endfor %}
-</div>
+        {% for category in categories %}
+            <a href="?category={{ category.id }}" class="category-btn">
+                {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                {% endif %}
+                <span>{{ category.name }}</span>
+            </a>
+        {% endfor %}
+    </div>
 
-
-    <h2 style="text-align:center;"></h2>
     <div class="container">
         {% for product in products %}
             <div class="product">
@@ -160,58 +282,85 @@
                 <strong>Price: Rs. {{ product.price }}</strong><br>
                 <p>{{ product.description|truncatechars:100 }}</p>
                 <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
-                <a href="{% url 'cart' %}" class="btn" style="
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background-color: #ff66a5;
-    padding: 0.6rem 1.2rem;
-    border-radius: 10px;
-    color: white;
-    font-weight: bold;
-    text-decoration: none;
-">
-    🛒 My Cart
-</a>
-
             </div>
         {% endfor %}
     </div>
-</body>
 
-<script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            for (const cookie of document.cookie.split(';')) {
-                const [key, value] = cookie.trim().split('=');
-                if (key === name) {
-                    cookieValue = decodeURIComponent(value);
-                    break;
-                }
-            }
+    <!-- Footer -->
+    <div class="footer">
+        <p>📍 Visit us at <b>Birtamode-5, Jhapa, Nepal</b></p>
+        <p>📞 Contact: <b>9801445777</b> | ✉️ <b>janakiverity5151@gmail.com</b></p>
+
+        <p>
+            Follow us:
+            <a href="https://www.instagram.com/YOUR_USERNAME" target="_blank"><b>Instagram</b></a> |
+            <a href="https://www.tiktok.com/@YOUR_USERNAME" target="_blank">TikTok</a>
+        </div>
+    </div>
+
+    <!-- Fixed Cart & Search Icons -->
+    <div class="cart-search-container">
+        <!-- Magnifying Glass (Search Icon) -->
+        <div class="search-container" onclick="toggleSearch()">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Search..." class="search-input">
+        </div>
+
+        <!-- Cart Link -->
+        <a href="{% url 'cart' %}" class="cart-link">🛒 My Cart ({{ cart_item_count }})</a>
+    </div>
+
+    <div class="header">Welcome to Janaki Verity</div>
+
+    <h2 style="text-align:center;">🌸 Categories 🌸</h2>
+    <div class="category-row">
+        {% for category in categories %}
+            <a href="?category={{ category.id }}" class="category-btn">
+                {% if category.image %}
+                    <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                {% endif %}
+                <span>{{ category.name }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="container">
+        {% for product in products %}
+            <div class="product">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% endif %}
+                <h2>{{ product.name }}</h2>
+                <strong>Price: Rs. {{ product.price }}</strong><br>
+                <p>{{ product.description|truncatechars:100 }}</p>
+                <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>📍 Visit us at <b>Birtamode-5, Jhapa, Nepal</b></p>
+        <p>📞 Contact: <b>9801445777</b> | ✉️ <b>janakiverity5151@gmail.com</b></p>
+
+        <p>
+            Follow us:
+            <a href="https://www.instagram.com/YOUR_USERNAME" target="_blank"><b>Instagram</b></a> |
+            <a href="https://www.tiktok.com/@YOUR_USERNAME" target="_blank"><b>TikTok</b></a>
+        </p>
+
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=..." 
+            width="100%" height="250" allowfullscreen loading="lazy">
+        </iframe>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        function toggleSearch() {
+            document.querySelector('.search-container').classList.toggle('active');
         }
-        return cookieValue;
-    }
-    
-    function addToCart(productId) {
-        fetch('/ajax/add-to-cart/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ product_id: productId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                document.getElementById('cart-count').textContent = data.cart_count;
-                // Optional: feedback to user
-                alert('✅ Added to cart!');
-            }
-        });
-    }
     </script>
-    
+
+</body>
 </html>

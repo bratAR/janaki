@@ -183,3 +183,10 @@ def checkout_view(request):
 # Thank you page
 def thank_you_view(request):
     return render(request, 'thankyou.html')
+
+def about_view(request):
+    return render(request, 'store/about.html')
+
+def contact_view(request):
+    return render(request, 'store/contact.html')
+
