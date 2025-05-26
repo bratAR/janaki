@@ -25,6 +25,7 @@ urlpatterns = [
     path('', include('store.urls')),
     path('', views.home, name='home'),
     path('cart/', views.cart_view, name='cart'),
+    path('search/', views.search_view, name='search'),
 ]
 
 if settings.DEBUG:

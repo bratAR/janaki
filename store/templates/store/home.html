@@ -52,7 +52,7 @@
         .cart-search-container {
             display: flex;
             gap: 1rem;
-            position: fixed;
+            position:absolute;
             top: 1rem;
             right: 1rem;
             z-index: 999;
@@ -100,7 +100,7 @@
             opacity: 1;
         }
 
-        .search-container.active .search-input {
+        .search-container .search-input {
             width: 180px;
             opacity: 1;
         }
@@ -221,6 +221,33 @@
             margin-top: 1rem;
             border-radius: 8px;
         }
+        .search-container {
+    display: flex;
+    align-items: center;
+    transition: width 0.3s ease;
+}
+
+.search-input {
+    width: 0;
+    opacity: 0;
+    transition: width 0.3s ease, opacity 0.3s ease;
+}
+
+.search-container .search-input {
+    width: 180px;
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .search-input {
+        width: 100%;
+    }
+
+    .search-container.active .search-input {
+        width: 100%;
+    }
+}
+
     </style>
 </head>
 
@@ -236,13 +263,15 @@
     <!-- Fixed Cart & Search Icons -->
     <div class="cart-search-container">
         <!-- Magnifying Glass (Search Icon) -->
-        <div class="search-container" onclick="toggleSearch()">
-            
-            <input type="text" placeholder="Search..." class="search-input">
-        </div>
+        <div class="search-container">
+    <form action="{% url 'search' %}" method="get" onsubmit="return validateSearch()" class="search-form">
+        <input type="text" name="q" placeholder="Search..." class="search-input" onclick="toggleSearch()" />
+    </form>
+</div>
+
 
         <!-- Cart Link -->
-        <a href="{% url 'cart' %}" class="cart-link">🛒Cart {{ cart_item_count }}</a>
+        <a href="{% url 'cart' %}" class="cart-link">🛒 {{ cart_item_count }}</a>
     </div>
 
     <div class="header">Welcome to Janaki Verity</div>
@@ -258,19 +287,29 @@
             </a>
         {% endfor %}
     </div>
+    <div>
+        <form action="{% url 'search' %}" method="get" onsubmit="return validateSearch()" class="search-form">
+    <input type="text" name="q" placeholder="Search..." class="search-input" onclick="toggleSearch()" />
+</form>
 
+    </div>
     <div class="container">
         {% for product in products %}
-            <div class="product">
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                {% endif %}
-                <h2>{{ product.name }}</h2>
-                <strong>Price: Rs. {{ product.price }}</strong><br>
-                <p>{{ product.description|truncatechars:100 }}</p>
-                <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
-            </div>
-        {% endfor %}
+    <div class="product"><a href="{% url 'product_detail' product.id %}" style="text-decoration: none; color: inherit;">
+    
+
+
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% endif %}
+            <h2>{{ product.name }}</h2>
+        </a>
+        <strong>Price: Rs. {{ product.price }}</strong>
+        <p>{{ product.description|truncatechars:100 }}</p>
+        <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
+    </div>
+{% endfor %}
+
     </div>
 
     <!-- Footer -->
@@ -299,10 +338,16 @@
 
     <!-- JavaScript -->
     <script>
-        function toggleSearch() {
-            document.querySelector('.search-container').classList.toggle('active');
-        }
-    </script>
+    function toggleSearch() {
+    document.getElementById('searchContainer').classList.toggle('active');
+}
+
+function validateSearch() {
+    const input = document.querySelector('.search-input').value;
+    return input.trim() !== '';
+}
+</script>
+
 
 </body>
 </html>

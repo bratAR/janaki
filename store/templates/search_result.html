@@ -1,0 +1,21 @@
+{% if query %}
+    <h2>Search results for "{{ query }}"</h2>
+{% endif %}
+
+{% if products %}
+    <div class="container">
+        {% for product in products %}
+            <div class="product">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% endif %}
+                <h2>{{ product.name }}</h2>
+                <strong>Price: Rs. {{ product.price }}</strong><br>
+                <p>{{ product.description|truncatechars:100 }}</p>
+                <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">Add to Cart</a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="text-align: center; color: red;">No products found.</p>
+{% endif %}

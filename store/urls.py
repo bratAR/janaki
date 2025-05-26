@@ -14,5 +14,9 @@ urlpatterns = [
     path('ajax/remove-from-cart/', views.ajax_remove_from_cart, name='ajax_remove_from_cart'),
     path('about/', views.about_view, name='about'),
     path('contact/', views.contact_view, name='contact'),
+    path('search/', views.search_view, name='search'),
+    path('product/<int:product_id>/', views.product_detail, name='product_detail'),   
+    path('product/<int:product_id>/add_stock/', views.add_stock, name='add_stock'),
+    path('product/<int:product_id>/remove_stock/', views.remove_stock, name='remove_stock'),
 
 ]

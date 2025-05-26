@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, redirect
 from .models import Product, Category
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
@@ -9,6 +9,29 @@ from django.http import HttpResponse
 from django.contrib import messages
 from django.shortcuts import render
 from .models import Order
+from . import views
+from django.contrib.auth.decorators import user_passes_test
+from .models import Product
+
+
+# Only staff (admin) users allowed
+def is_staff_user(user):
+    return user.is_staff
+
+@user_passes_test(is_staff_user)
+def add_stock(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    product.stock += 1
+    product.save()
+    return redirect('product_detail', product_id=product_id)
+
+@user_passes_test(is_staff_user)
+def remove_stock(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if product.stock > 0:
+        product.stock -= 1
+        product.save()
+    return redirect('product_detail', product_id=product_id)
 
 
 # Home page - with category filtering
@@ -190,3 +213,33 @@ def about_view(request):
 def contact_view(request):
     return render(request, 'store/contact.html')
 
+
+def search_view(request):
+    query = request.GET.get('q')
+    products = Product.objects.all()
+
+    if query:
+        products = products.filter(name__icontains=query)  # Searches by name (case-insensitive)
+
+    return render(request, 'store/home.html', {
+        'products': products,
+        'query': query,
+        # Include other context like categories or cart count if needed
+    })
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    return render(request, 'store/product_detail.html', {'product': product})
+
+def add_stock(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    product.stock += 1
+    product.save()
+    return redirect('product_detail', product_id=product.id)
+
+def remove_stock(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    if product.stock > 0:
+        product.stock -= 1
+        product.save()
+    return redirect('product_detail', product_id=product.id)
